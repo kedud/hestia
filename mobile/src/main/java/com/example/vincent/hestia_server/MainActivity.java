@@ -186,7 +186,7 @@ public class MainActivity extends Activity {
 
         if (components.length == Integer.parseInt(components[0]) && components.length == 30){     //If the entire message is received
             //Let's parse it
-            mDumpTextView.append("Let's Parse that shit !\n\n");
+            Log.d("Update Received Data","Try parsing the incoming data");
             lastDataLength = 0;
             SensorData sensor = SensorData.parseSensorData(HexDump.dumpHexString(data));
             mDumpTextView.append(" SensorID =  " + sensor.getNodeID()

@@ -170,6 +170,7 @@ public class SerialSelectorActivity extends Activity {
                         String.format("%s device(s) found",Integer.valueOf(mEntries.size())));
                 hideProgressBar();
                 Log.d(TAG, "Done refreshing, " + mEntries.size() + " entries found.");
+                if(mEntries.size() == 1) showConsoleActivity(mEntries.get(0)); //Automatically open the first device if only one is available.
             }
 
         }.execute((Void) null);
