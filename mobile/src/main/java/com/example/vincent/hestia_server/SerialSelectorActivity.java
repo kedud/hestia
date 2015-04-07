@@ -11,26 +11,20 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.TwoLineListItem;
-
 
 import java.util.ArrayList;
 import java.util.List;
 
-
 import SerialDriver.UsbSerialDriver;
 import SerialDriver.UsbSerialPort;
 import SerialDriver.UsbSerialProber;
-
 import SerialUtils.HexDump;
 
 
@@ -70,6 +64,7 @@ public class SerialSelectorActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_serial_selector);
 
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
@@ -154,7 +149,6 @@ public class SerialSelectorActivity extends Activity {
                             driver, Integer.valueOf(ports.size()), ports.size() == 1 ? "" : "s"));
                     result.addAll(ports);
                 }
-
                 return result;
             }
 

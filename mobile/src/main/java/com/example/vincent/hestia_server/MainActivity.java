@@ -7,6 +7,7 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -77,12 +78,12 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
-        mTitleTextView = (TextView) findViewById(R.id.demoTitle);
+        mTitleTextView = (TextView) findViewById(R.id.ActivityTitle);
         mDumpTextView = (TextView) findViewById(R.id.consoleText);
         mScrollView = (ScrollView) findViewById(R.id.demoScroller);
-
 
     }
 
@@ -162,7 +163,7 @@ public class MainActivity extends Activity {
     private void updateReceivedData(byte[] data) {
         final String line = HexDump.dumpHexString(data);
         final String message = "Read " + data.length + " bytes: \n"
-                 + HexDump.dumpHexString(data)  + "\n\n";
+                + HexDump.dumpHexString(data)  + "\n\n";
 
         mDumpTextView.append(message);
 
