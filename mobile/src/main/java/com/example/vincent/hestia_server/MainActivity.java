@@ -5,19 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
-import android.nfc.FormatException;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import org.w3c.dom.NodeList;
-
 import Collect.CollectServer;
-import Collect.DefaultListModel;
-import Collect.Node;
 import Collect.SensorData;
 import SerialDriver.UsbSerialPort;
 import SerialUtils.SerialInputOutputManager;
@@ -25,13 +18,6 @@ import SerialUtils.HexDump;
 
 
 import java.io.IOException;
-import java.security.acl.LastOwnerException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -64,7 +50,6 @@ public class MainActivity extends Activity {
     private TextView mTitleTextView;
     private TextView mDumpTextView;
     private ScrollView mScrollView;
-    private CollectServer server = new CollectServer();
 
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
