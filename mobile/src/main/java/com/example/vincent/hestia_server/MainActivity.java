@@ -10,7 +10,6 @@ import android.util.Log;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import Collect.CollectServer;
 import Collect.SensorData;
 import SerialDriver.UsbSerialPort;
 import SerialUtils.SerialInputOutputManager;
