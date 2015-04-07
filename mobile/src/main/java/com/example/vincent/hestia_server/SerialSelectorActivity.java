@@ -43,8 +43,7 @@ public class SerialSelectorActivity extends Activity {
 
     private UsbManager mUsbManager;
     private ListView mListView;
-    private TextView mProgressBarTitle;
-    private ProgressBar mProgressBar;
+
 
     private static final int MESSAGE_REFRESH = 101;
     private static final long REFRESH_TIMEOUT_MILLIS = 5000;
@@ -75,8 +74,7 @@ public class SerialSelectorActivity extends Activity {
 
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         mListView = (ListView) findViewById(R.id.deviceList);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-        mProgressBarTitle = (TextView) findViewById(R.id.progressBarTitle);
+
 
         mAdapter = new ArrayAdapter<UsbSerialPort>(this,
                 android.R.layout.simple_expandable_list_item_2, mEntries) {
@@ -139,7 +137,6 @@ public class SerialSelectorActivity extends Activity {
     }
 
     private void refreshDeviceList() {
-        showProgressBar();
 
         new AsyncTask<Void, Void, List<UsbSerialPort>>() {
             @Override
@@ -166,23 +163,12 @@ public class SerialSelectorActivity extends Activity {
                 mEntries.clear();
                 mEntries.addAll(result);
                 mAdapter.notifyDataSetChanged();
-                mProgressBarTitle.setText(
-                        String.format("%s device(s) found",Integer.valueOf(mEntries.size())));
-                hideProgressBar();
+
                 Log.d(TAG, "Done refreshing, " + mEntries.size() + " entries found.");
                 if(mEntries.size() == 1) showConsoleActivity(mEntries.get(0)); //Automatically open the first device if only one is available.
             }
 
         }.execute((Void) null);
-    }
-
-    private void showProgressBar() {
-        mProgressBar.setVisibility(View.VISIBLE);
-        mProgressBarTitle.setText(R.string.refreshing);
-    }
-
-    private void hideProgressBar() {
-        mProgressBar.setVisibility(View.INVISIBLE);
     }
 
     private void showConsoleActivity(UsbSerialPort port) {

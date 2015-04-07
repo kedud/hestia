@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
+import android.nfc.FormatException;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
@@ -103,7 +104,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
-        /*super.onPause();
+        super.onPause();
         stopIoManager();
         if (sPort != null) {
             try {
@@ -114,7 +115,7 @@ public class MainActivity extends Activity {
             sPort = null;
         }
         finish();
-        */
+
     }
 
     @Override
@@ -181,62 +182,67 @@ public class MainActivity extends Activity {
 
         mDumpTextView.append(message);
 
+        try {
 
-        components = line.trim().split("[ \t]+");
+            components = line.trim().split("[ \t]+");
 
-        if (components.length == Integer.parseInt(components[0]) && components.length == 30){     //If the entire message is received
-            //Let's parse it
-            Log.d("Update Received Data","Try parsing the incoming data");
-            lastDataLength = 0;
-            SensorData sensor = SensorData.parseSensorData(HexDump.dumpHexString(data));
-            mDumpTextView.append(" SensorID =  " + sensor.getNodeID()
-                    +"\t temperature = " + sensor.getTemperature()
-                    +"\n\n");
+            if (components.length == Integer.parseInt(components[0]) && components.length == 30) {     //If the entire message is received
+                //Let's parse it
+                Log.d("Update Received Data", "Try parsing the incoming data");
+                lastDataLength = 0;
+                SensorData sensor = SensorData.parseSensorData(HexDump.dumpHexString(data));
+                mDumpTextView.append(" SensorID =  " + sensor.getNodeID()
+                        + "\t temperature = " + sensor.getTemperature()
+                        + "\n\n");
 
-        }
-        else {
-            if(components.length < 30 ){                                   //The message is not complete, we have to wait for the 2nd part, or complete the 1st part.
-                if (lastDataLength == 0) {                                  //if the last message is complete, or was completed.
-                    lastDataLength = components.length;
+            } else {
+                if (components.length < 30) {                                   //The message is not complete, we have to wait for the 2nd part, or complete the 1st part.
+                    if (lastDataLength == 0) {                                  //if the last message is complete, or was completed.
+                        lastDataLength = components.length;
 
-                    for(int i=0; i<components.length;i++){
-                        lastData[i] = components[i];
-                    }
-                    mDumpTextView.append("Partial MSG size = " + components.length +"\n\n");
-                }else{                                              //The temporary array is already filled with some data, we add the new data.
-                    if((lastDataLength + components.length) <= 30){       //we check that the data we received and the data that were stored doesn't exceed the array.
-                        for(int i=0; i<components.length;i++){
-                            lastData[i + lastDataLength] = components[i];
+                        for (int i = 0; i < components.length; i++) {
+                            lastData[i] = components[i];
                         }
-                        lastDataLength += components.length;
-                        mDumpTextView.append("Partial MSG size = " + components.length +"\n\n");
-                        if(lastDataLength == 30){      // The message is complete, we can parse the message
-                            lastDataLength = 0;
-                            mDumpTextView.append("FULL MSG = ");
-
-                            for(int i=0; i<lastData.length;i++)
-                            mDumpTextView.append(lastData[i]);
-                            mDumpTextView.append("\n\n");
-
-                            String joined = new String();
-                            for(int i=0; i<lastData.length;i++) {
-                                joined += lastData[i];
-                                if (i == lastData.length) {
-
-                                } else joined += "\t";
-
+                        mDumpTextView.append("Partial MSG size = " + components.length + "\n\n");
+                    } else {                                              //The temporary array is already filled with some data, we add the new data.
+                        if ((lastDataLength + components.length) <= 30) {       //we check that the data we received and the data that were stored doesn't exceed the array.
+                            for (int i = 0; i < components.length; i++) {
+                                lastData[i + lastDataLength] = components[i];
                             }
-                            SensorData sensor = SensorData.parseSensorData(joined);
-                            mDumpTextView.append(" SensorID =  " + sensor.getNodeID()
-                                    +"\t temperature = " + sensor.getTemperature()
-                                    +"\n\n");
-                        }
+                            lastDataLength += components.length;
+                            mDumpTextView.append("Partial MSG size = " + components.length + "\n\n");
+                            if (lastDataLength == 30) {      // The message is complete, we can parse the message
+                                lastDataLength = 0;
+                                mDumpTextView.append("FULL MSG = ");
 
-                    }else {                                           //If the message exceed the size, we cannot use it...
-                        lastDataLength = 0;
+                                for (int i = 0; i < lastData.length; i++)
+                                    mDumpTextView.append(lastData[i]);
+                                mDumpTextView.append("\n\n");
+
+                                String joined = new String();
+                                for (int i = 0; i < lastData.length; i++) {
+                                    joined += lastData[i];
+                                    if (i == lastData.length) {
+
+                                    } else joined += "\t";
+
+                                }
+                                SensorData sensor = SensorData.parseSensorData(joined);
+                                mDumpTextView.append(" SensorID =  " + sensor.getNodeID()
+                                        + "\t temperature = " + sensor.getTemperature()
+                                        + "\n\n");
+                            }
+
+                        } else {                                           //If the message exceed the size, we cannot use it...
+                            lastDataLength = 0;
+                        }
                     }
                 }
             }
+        }
+        catch(NumberFormatException e)
+        {
+            mDumpTextView.append(e.getMessage());
         }
 
     }
