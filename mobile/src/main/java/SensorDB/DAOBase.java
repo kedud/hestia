@@ -10,10 +10,10 @@ public abstract class DAOBase
     protected final static String NOM = "database_sensors.db";
 
     protected SQLiteDatabase mDb = null;
-    protected MyDataBase mHandler = null;
+    protected SensorDataBase mHandler = null;
 
     public DAOBase(Context pContext) {
-        this.mHandler = new MyDataBase(pContext);
+        this.mHandler = new SensorDataBase(pContext);
     }
 
     public SQLiteDatabase open() {

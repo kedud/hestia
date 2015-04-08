@@ -6,18 +6,23 @@ import android.content.Intent;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.Window;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import Collect.SensorData;
+import SensorDB.SensorDataBase;
+import SensorDB.Sensor;
 import SerialDriver.UsbSerialPort;
 import SerialUtils.SerialInputOutputManager;
 import SerialUtils.HexDump;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -54,6 +59,11 @@ public class MainActivity extends Activity {
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
     private SerialInputOutputManager mSerialIoManager;
+
+
+    private SensorDataBase SensorsDB = new SensorDataBase(this);
+    private ArrayList<Sensor> SensorsList = new ArrayList<Sensor>();
+
 
     private final SerialInputOutputManager.Listener mListener =
             new SerialInputOutputManager.Listener() {
@@ -179,6 +189,10 @@ public class MainActivity extends Activity {
                 mDumpTextView.append(" SensorID =  " + sensor.getNodeID()
                         + "\t temperature = " + sensor.getTemperature()
                         + "\n\n");
+                mDumpTextView.append("Trying DB add\n"); //DEBUG
+
+                AddToDB(sensor);
+
 
             } else {
                 if (components.length < 30) {                                   //The message is not complete, we have to wait for the 2nd part, or complete the 1st part.
@@ -216,6 +230,9 @@ public class MainActivity extends Activity {
                                 mDumpTextView.append(" SensorID =  " + sensor.getNodeID()
                                         + "\t temperature = " + sensor.getTemperature()
                                         + "\n\n");
+                                mDumpTextView.append("Trying DB add\n"); //DEBUG
+
+                                AddToDB(sensor);
                             }
 
                         } else {                                           //If the message exceed the size, we cannot use it...
@@ -230,6 +247,49 @@ public class MainActivity extends Activity {
             mDumpTextView.append(e.getMessage());
         }
 
+    }
+
+
+    private void AddToDB(SensorData sensor){
+
+        mDumpTextView.append("Trying DB add\n"); //DEBUG
+
+        try {
+            Time now = new Time();
+            now.setToNow();
+            String ActualTime = Long.toString(now.toMillis(false) / (1000 * 60));
+
+            try {
+
+            SensorsList = SensorsDB.getInformation(SensorsDB);           //Get the database
+                if(SensorsList == null){
+                    mDumpTextView.append("\n\nSENSORLIST == NULL\n");
+                    SensorsDB.putInformation(SensorsDB, sensor, ActualTime);
+                }
+            for(int i=0; i < SensorsList.size(); i++){                    //Check if the sensor is already in the base
+                if(SensorsList.get(i).getId() == Integer.parseInt(sensor.getNodeID())   ) //If the sensor's ID is in the database, we only update the data
+                {
+                    mDumpTextView.append("\n\t ID EXISTANT\n");
+                    mDumpTextView.append("\n\t UPDATED !! \n");
+                    break;
+                }else{
+                    if (i == SensorsList.size()){                       //If we reach the end of the database without finding our sensor, we add it to the DB
+                        SensorsDB.putInformation(SensorsDB, sensor, ActualTime);
+                    }
+                }
+            }
+                SensorsList = SensorsDB.getInformation(SensorsDB);
+                for (int i = 0; i < SensorsList.size(); i++) {                    //DEBUG: display sensors list
+                    mDumpTextView.append(SensorsList.get(i).toString() + "\n");
+                    mDumpTextView.append(String.valueOf(SensorsList.size()));
+                }
+            }catch (NullPointerException e){
+                mDumpTextView.append(e.getMessage());
+            }
+        }catch(NumberFormatException e)
+        {
+            mDumpTextView.append(e.getMessage());
+        }
     }
 
     /**
