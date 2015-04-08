@@ -8,8 +8,10 @@ import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import Collect.SensorData;
@@ -54,7 +56,14 @@ public class MainActivity extends Activity {
 
     private TextView mTitleTextView;
     private TextView mDumpTextView;
+    private TextView mTemperatureText;
     private ScrollView mScrollView;
+    private SeekBar seek;
+
+
+    private float DEFAULT_TEMP = 20;
+    private float TARGET_TEMP = DEFAULT_TEMP;
+
 
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
@@ -92,8 +101,31 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         mTitleTextView = (TextView) findViewById(R.id.ActivityTitle);
+        seek = (SeekBar) findViewById(R.id.seekBar);
+        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                TARGET_TEMP = DEFAULT_TEMP + (float)(((float)progress - 50.0) / 10.0);
+                mTemperatureText.setText(String.valueOf(TARGET_TEMP));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         mDumpTextView = (TextView) findViewById(R.id.consoleText);
         mScrollView = (ScrollView) findViewById(R.id.demoScroller);
+        mDumpTextView.setVisibility(View.INVISIBLE);
+        mTemperatureText = (TextView) findViewById(R.id.temperature);
+        mTemperatureText.setTextSize(getResources().getDimension(R.dimen.textsize));
+        mTemperatureText.setText(String.valueOf( DEFAULT_TEMP ));
 
     }
 
